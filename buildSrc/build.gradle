@@ -1,0 +1,13 @@
+//apply plugin: 'groovy'
+//apply plugin: 'java'
+//
+//repositories {
+//    mavenCentral()
+//    jcenter()
+//}
+//
+//dependencies {
+//    compile gradleApi()
+//    compile localGroovy()
+//    compile 'com.android.tools.build:gradle:2.2.0'
+//}
