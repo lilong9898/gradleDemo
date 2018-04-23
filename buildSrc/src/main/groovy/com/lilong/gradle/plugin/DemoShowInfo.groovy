@@ -7,7 +7,7 @@ class DemoShowInfo implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        
+        project.logger.lifecycle("===project.name : ${project.name}===")
     }
 
 }

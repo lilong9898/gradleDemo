@@ -1,1 +1,2 @@
+println "setting script"
 include ':app'
