@@ -1,6 +1,5 @@
-println "app script"
-apply plugin: com.lilong.gradle.Demo
 apply plugin: 'com.android.application'
+apply plugin: com.lilong.gradle.Demo
 
 android {
     compileSdkVersion 26
