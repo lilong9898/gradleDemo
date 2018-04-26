@@ -30,6 +30,8 @@ class DemoShowInfo implements Plugin<Project> {
         for (taskName in project.defaultTasks){
             project.logger.lifecycle("===project.defaultTasks name : ${taskName}===")
         }
+
+        project.logger.lifecycle "===haha" + v
     }
 
 }

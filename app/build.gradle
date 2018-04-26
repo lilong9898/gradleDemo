@@ -19,6 +19,13 @@ android {
     }
 }
 
+demoExtension {
+    demoExtensionProperty "haha"
+    // 无参数时方法调用的括号不能省略
+    demoExtensionMethod1()
+    demoExtensionMethod2 "hehe"
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support.constraint:constraint-layout:1.1.0'
