@@ -19,12 +19,12 @@ android {
     }
 }
 
-demoExtension {
-    demoExtensionProperty "haha"
+//demoExtension {
+//    demoExtensionProperty "haha"
     // 无参数时方法调用的括号不能省略
-    demoExtensionMethod1()
-    demoExtensionMethod2 "hehe"
-}
+//    demoExtensionMethod1()
+//    demoExtensionMethod2 "hehe"
+//}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])

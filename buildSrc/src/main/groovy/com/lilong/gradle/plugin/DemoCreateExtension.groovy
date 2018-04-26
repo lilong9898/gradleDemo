@@ -7,10 +7,11 @@ class DemoCreateExtension implements Plugin<Project>{
 
     @Override
     void apply(Project project) {
+
         //　创建一个extension，前两个参数是extension名字和extension的定义类，后面的参数是可变参数，用来给extension定义类的constructor提供参数
         // 创建好后将此extension注入project, project就会被加入demoExtension方法
         // 所以在本插件apply之前，主工程build.gradle中不能写demoExtension {....}，因为extension还未被注入，project中还没有demoExtension方法
-        def demoExtension = project.extensions.create("demoExtension", DemoExtension, project)
+        def demoExtension = project.extensions.create "demoExtension", DemoExtension, project
         // 之后任何时候主工程build.gradle中写了demoExtension {...}，就会配置这个extension，demoExtension中的各项数据就会被赋值
         // 所以为了保证demoExtension的各项数据不是null，要在project evalute完后再提取其数据
         project.logger.lifecycle "===when project.apply is called : ${}"

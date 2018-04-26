@@ -1,7 +1,13 @@
 package com.lilong.gradle.plugin
 
+import org.gradle.BuildListener
+import org.gradle.BuildResult
 import org.gradle.api.Plugin
-import org.gradle.api.Project;
+import org.gradle.api.Project
+import org.gradle.api.ProjectEvaluationListener
+import org.gradle.api.ProjectState
+import org.gradle.api.initialization.Settings
+import org.gradle.api.invocation.Gradle;
 
 class DemoShowLifeCycle implements Plugin<Project> {
 
@@ -45,5 +51,57 @@ class DemoShowLifeCycle implements Plugin<Project> {
                 project.logger.lifecycle "===project.afterEvaluate {project.android.applicationVariants.all variant} = ${applicationVariant.name}==="
             }
         }
+
+        /**
+         * 用configure方法来配置project
+         * 注意：afterEvaluate方法会把closure加到一个监听器的集合中，所以多次调用afterEvaluate会把多个监听按照调用顺序都加入到监听器的集合里
+         * 当project完成evaluate后会按监听器的集合中加入的顺序依次调用closure
+         * */
+        project.configure(project) {
+            project.logger.lifecycle "===project.configure==="
+            afterEvaluate {
+                project.logger.lifecycle "===configure's after evaluate"
+            }
+            project.logger.lifecycle "===project.configure2==="
+        }
+
+        project.gradle.addProjectEvaluationListener(new ProjectEvaluationListener() {
+            @Override
+            void beforeEvaluate(Project p) {
+                project.logger.lifecycle "===projectEvaluationListener:beforeEvalute"
+            }
+
+            @Override
+            void afterEvaluate(Project p, ProjectState projectState) {
+                project.logger.lifecycle "===projectEvaluationListener:afterEvalute"
+            }
+        })
+
+        project.gradle.addBuildListener(new BuildListener() {
+            @Override
+            void buildStarted(Gradle gradle) {
+                project.logger.lifecycle "===BuildListener : buildStarted==="
+            }
+
+            @Override
+            void settingsEvaluated(Settings settings) {
+                project.logger.lifecycle "===BuildListener : settingsEvaluated==="
+            }
+
+            @Override
+            void projectsLoaded(Gradle gradle) {
+                project.logger.lifecycle "===BuildListener : projectsLoaded==="
+            }
+
+            @Override
+            void projectsEvaluated(Gradle gradle) {
+                project.logger.lifecycle "===BuildListener : projectsEvaluated==="
+            }
+
+            @Override
+            void buildFinished(BuildResult buildResult) {
+                project.logger.lifecycle "===BuildListener : buildFinished==="
+            }
+        })
     }
 }
