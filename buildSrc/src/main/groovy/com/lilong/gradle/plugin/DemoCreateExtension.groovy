@@ -14,7 +14,6 @@ class DemoCreateExtension implements Plugin<Project>{
         def demoExtension = project.extensions.create "demoExtension", DemoExtension, project
         // 之后任何时候主工程build.gradle中写了demoExtension {...}，就会配置这个extension，demoExtension中的各项数据就会被赋值
         // 所以为了保证demoExtension的各项数据不是null，要在project evalute完后再提取其数据
-        project.logger.lifecycle "===when project.apply is called : ${}"
         // groovy的string interpolation，只能找到局部变量，也就是由def类型或者具体类型定义的变量
         // 无前缀的变量会进入script的binding里，所以string interpolation无法找到
         project.logger.lifecycle "===when apply is called : demoExtension.demoExtensionProperty = ${demoExtension.demoExtensionProperty}"

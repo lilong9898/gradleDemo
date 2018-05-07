@@ -112,6 +112,7 @@ class DemoShowInfo implements Plugin<Project> {
                 variant.buildConfigField "String", "BUILD_CONFIG_FIELD_RELEASE_ONLY", '"build_config_field_release_only"'
             }
         }
+
     }
 
 }

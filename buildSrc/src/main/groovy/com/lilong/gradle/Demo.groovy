@@ -1,6 +1,6 @@
 package com.lilong.gradle
 
-import com.lilong.gradle.plugin.DemoShowInfo
+import com.lilong.gradle.plugin.DemoAdjustApkOutput
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 // 插件的两大作用：
@@ -11,8 +11,9 @@ class Demo implements Plugin<Project> {
     @Override
     void apply(Project project) {
 //        new DemoShowLifeCycle().apply(project)
-        new DemoShowInfo().apply(project)
+//        new DemoShowInfo().apply(project)
 //        new DemoCreateExtension().apply(project)
 //        new DemoCreateTask().apply(project)
+        new DemoAdjustApkOutput().apply(project)
     }
 }
