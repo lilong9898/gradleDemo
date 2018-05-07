@@ -1,7 +1,7 @@
 package com.lilong.gradle.plugin
 
 import org.gradle.api.Plugin
-import org.gradle.api.Project;
+import org.gradle.api.Project
 
 class DemoAdjustApkOutput implements Plugin<Project>{
 
@@ -30,6 +30,21 @@ class DemoAdjustApkOutput implements Plugin<Project>{
                 project.logger.lifecycle "===originalOutputFile.name : ${originalOutputFile.name}"
                 File adjustedOutputFile = new File(originalOutputFile.parent, originalOutputFile.name.split("\\.")[0] + "_adjusted" + ".apk");
                 output.outputFile = adjustedOutputFile;
+                project.copy {
+                    // apk原样拷贝到另一个目录
+                    from adjustedOutputFile.absolutePath
+                    into adjustedOutputFile.parent + "_copied"
+                    // apk重命名后拷贝到同一个目录
+                    // 方法参数中包括闭包和其它参数时，其它参数的括号不能省略
+                    // rename的操作要写在from方法的闭包参数里，写在into方法的闭包参数里无效
+                    from (adjustedOutputFile.absolutePath) {
+                        // rename 方法的闭包参数的返回值为重命名后的文件名
+                        rename {
+                            return "renamed.apk"
+                        }
+                    }
+                    into (adjustedOutputFile.parent)
+                }
             }
         }
     }
