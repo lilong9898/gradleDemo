@@ -1,7 +1,7 @@
 package com.lilong.gradle.plugin
 
 import org.gradle.api.Plugin
-import org.gradle.api.Project;
+import org.gradle.api.Project
 
 class DemoShowInfo implements Plugin<Project> {
 
