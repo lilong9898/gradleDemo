@@ -1,0 +1,120 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+// ---实现类似provided方式依赖远程module：具体脚本---
+// ---需要加在插件build.gradle的dependency{}块后，因为必须在gradle解析完依赖后执行这个脚本
+
+String SUPPORT_LIB_JARS_DIR_PATH = "external-support-lib-jars";
+// supportLibJars是用来存放support包中所有依赖的aar包中的jar包的目录
+File supportLibJarsDir = new File(project.projectDir.absolutePath + File.separator + SUPPORT_LIB_JARS_DIR_PATH);
+// 如果providedExternalModule这个configuration中有依赖，则这里先删掉之前的external_support_lib_jars目录，重新从gradle缓存中提取aar放入重建的external_support_lib_jars目录
+if(configurations.providedExternalModule.asPath && supportLibJarsDir.exists() && supportLibJarsDir.isDirectory()){
+    supportLibJarsDir.deleteDir()
+}
+// configurations.providedExternalModule是我们在build.gradle中自定义的configuration
+// asPath是gradle提供的方法，可以返回某个configuration所依赖的module的所有aar包或jar包的地址(包括transitive依赖的)，用:号分隔
+// [依赖下载/解析过程和查看结果的异步问题]
+// 注意！asPath方法会因为下载依赖而阻塞！如果asPath要输出的依赖在gradle缓存中没有，gradle需要去下载依赖，asPath方法会阻塞
+// 直到依赖下载完，会继续执行，所以，asPath总是能在依赖下载完解析完后输出结果
+configurations.providedExternalModule.asPath.split(":").each { String path ->
+
+    // 提取这个依赖的groupId，作为aar包或jar包文件名的一部分（因为不同的groupId的依赖可能有同样的名字的aar包或jar包，会导致后面的覆盖前面的）
+    String groupId = getGroupIdFromPath(path)
+
+    try {
+        File from = new File(path);
+        FileInputStream inputStream = new FileInputStream(from);
+        if (!supportLibJarsDir.exists()) {
+            supportLibJarsDir.mkdirs();
+        }
+        File to = new File(supportLibJarsDir, groupId + "_" + from.getName());
+        FileOutputStream outputStream = new FileOutputStream(to);
+        // 然后将asPath返回的providedExternalModule方式依赖的aar包都拷贝到supportLibJars目录下
+        copyAndCloseStream(inputStream, outputStream);
+    } catch (Exception e) {
+        println e.toString()
+    }
+}
+
+// 最后把supportLibJars目录下的aar包都解压提取其中的jar包，并删掉aar包
+if (supportLibJarsDir.exists() && supportLibJarsDir.isDirectory()) {
+    File[] files = supportLibJarsDir.listFiles();
+    files.each { File file ->
+        if (file.name.endsWith(".aar")) {
+            getJarFromAar(file)
+            file.delete()
+        }
+    }
+}
+
+// 从形如/home/lilong/.gradle/caches/modules-2/files-2.1/com.android.support/design/28.0.0/bef882d1796b085fa89a5f1cec42a8edd2351e6c/design-28.0.0.aar
+// 这样的路径中把groupId(com.android.support)提取出来
+String getGroupIdFromPath(String path){
+    // 先看groupId是否为xxx.xxx.xxx形式
+    Pattern patternGroupIdThreeSegments = Pattern.compile("[a-z]+\\.[a-z]+\\.[a-z]+")
+    Matcher matcherGroupIdThreeSegments = patternGroupIdThreeSegments.matcher(path)
+    String groupId = "";
+    if(matcherGroupIdThreeSegments.find()){
+        groupId = matcherGroupIdThreeSegments.group()
+        return groupId;
+    }
+    // 没找到，再看groupId是否为xxx.xxx形式
+    Pattern patternGroupIdTwoSegments = Pattern.compile("[a-z]+\\.[a-z]+")
+    Matcher matcherGroupIdTwoSegments = patternGroupIdTwoSegments.matcher(path)
+    if(matcherGroupIdTwoSegments.find()){
+        groupId = matcherGroupIdTwoSegments.group();
+        return groupId;
+    }
+    // 还是没找到，返回"unspecified"
+    return "unspecified"
+}
+
+// 把inputStream的内容拷贝到outputStream
+void copyAndCloseStream(InputStream inputStream, OutputStream outputStream) {
+    if (inputStream == null || outputStream == null) {
+        return;
+    }
+    try {
+        byte[] buffer = new byte[1024];
+        int length = 0;
+        while ((length = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, length);
+        }
+        inputStream.close();
+        outputStream.close();
+    } catch (Exception e) {
+    }
+}
+
+// 提取一个aar包中的classes.jar包，用aar包的名字重命名，最后写入到aar包所在的目录
+def getJarFromAar(File aar) {
+    String aarName = aar.name
+    ZipFile aarFile = new ZipFile(aar)
+    try {
+        Enumeration<ZipEntry> entries = aarFile.entries()
+        while (entries.hasMoreElements()) {
+            ZipEntry zipEntry = entries.nextElement()
+            if (zipEntry.name == 'classes.jar') {
+                InputStream inputStream = aarFile.getInputStream(zipEntry)
+                File file = new File(aar.parent, aarName - '.aar' + '.jar')
+                OutputStream outputStream = new FileOutputStream(file)
+                byte[] buffer = new byte[1024];
+                int size = 0;
+                while ((size = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, size);
+                }
+                outputStream.close()
+                inputStream.close()
+            }
+        }
+    } catch (Exception e) {
+    } finally {
+    }
+}
+
+// 可以单独运行这个task把providedExternalModule这个configuration所依赖的aar拷贝到supportLibJars目录里
+//task copyAllDependencies(type: Copy) {
+//    from configurations.providedExternalModule
+//    into 'supportLibJars'
+//}

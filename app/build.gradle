@@ -26,7 +26,18 @@ android {
 //    demoExtensionMethod2 "hehe"
 //}
 
+// ---实现类似provided方式依赖远程module---
+// 自定义一个configuration=providedExternalModule，以便在dependencies块中使用
+// 其作用是：使用这个configuration添加依赖的module，都会用provided_project.gradle脚本提取其所依赖的所有aar包，进一步提取其中的jar包，最后都拷贝到supportLibJars目录下
+// 而supportLibJars目录是以provided方式被添加到依赖里的，最终实现类似provided依赖的效果
+configurations {
+    providedExternalModule.setTransitive(true)
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support.constraint:constraint-layout:1.1.0'
+    providedExternalModule "com.android.support:design:26.0.0"
 }
+
+apply from: "provided_project.gradle"
