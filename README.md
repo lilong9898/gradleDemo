@@ -37,3 +37,10 @@
 - "provided"是一种configuration,我们可以自定义一个configuration,利用它的asPath方法获取用这个configuration依赖的远程库的所有aar包路径
 - 远程库的aar包在用户的gradle缓存目录里,利用上一步得到的路径,可以找到这些aar包,提取其内部的jar包,然后都拷贝到特定目录里
 - 最后,用provided方式依赖特定目录里的所有jar包
+
+# MultiDex构建过程中补足mainDex中缺失的内部类
+## 问题由来
+- 在Android构建过程中,如果java代码总方法数超过65536,就需要进行MultiDex处理,将代码分散到多个Dex中
+- 在Android 4.4及以下系统上,应用启动时会先加载apk中的classes.dex,再通过MultiApplication加载其它classesX.dex
+- 这个最先加载的classes.dex,称为mainDex,应包含应用启动过程中所需的最低限度的代码.如果缺少了某些类,会导致NoClassDefFound异常,进而崩溃
+- 从线上情况看,有些<4.4的手机,
