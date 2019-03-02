@@ -31,3 +31,9 @@
    apply from: "provided_project.gradle"
 ```
 - 最后,也是最简单的一步,拷贝脚本provided_project.gradle到build.gradle的同级目录
+
+## 原理
+- Android Gradle插件不允许以provided方式依赖aar包或任何project(本地或远程),这是无法改变的
+- "provided"是一种configuration,我们可以自定义一个configuration,利用它的asPath方法获取用这个configuration依赖的远程库的所有aar包路径
+- 远程库的aar包在用户的gradle缓存目录里,利用上一步得到的路径,可以找到这些aar包,提取其内部的jar包,然后都拷贝到特定目录里
+- 最后,用provided方式依赖特定目录里的所有jar包
