@@ -1,0 +1,1 @@
+# Gradle脚本实现provided方式依赖远程project
