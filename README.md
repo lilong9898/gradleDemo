@@ -75,4 +75,8 @@
    }
    ...
 ```
+## 原理
+- 默认的Gradle task : transformClassesWithMultidexlist会在build/intermediates/multi-dex/目录下生成maindexlist.txt,内容是它认为应当出现在mainDex中的类
+- 默认的Gradle task : transformClassesWithDex会根据maindexlist.txt生成mainDex,即classes.dex
+- 在这两个task中间,插入自定义task : fixMainDexTask,其
 
