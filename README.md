@@ -56,8 +56,13 @@
 - 最终apk的classes.dex中,有了android/preference/ColorSwitchPreference$Listener.class,还有其它补进mainDex的内部类
 ## 如何配置
 - 将本demo的buildSrc目录复制到工程目录中,这里面包含本脚本所属的Gradle插件:
-  
-- 在build.gradle的开头引入
+  ![](./5.png)  
+- 在build.gradle的开头引入Gradle插件:
+```groovy
+   ...
+   apply plugin: com.lilong.gradle.Demo
+   ...
+```
 - 在build.gradle的android块中加入minimal-main-dex设置:
 ```groovy
    ...
