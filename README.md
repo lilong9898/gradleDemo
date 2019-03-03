@@ -47,6 +47,7 @@
 - 本Gradle脚本的功能就是补足mainDex中缺失的A$B.class这样的内部类
 ## 演示
 ![](./2.png) 
+- 使用本脚本后,构建过程中transformClassesWithJarMerging的默认task前,出现了一个新task:transformClassesWithCollectJarClassInfoTransform
 - 使用本脚本后,构建过程中transformClassesWithMultidexlist和transformClassesWithDex两个默认的task之间,出现了一个新task:fixMainDexTask 
 
 ![](./3.png)
@@ -76,7 +77,9 @@
    ...
 ```
 ## 原理
+- 用transformAPI注册一个名为CollectJarClassInfo的transform,这会导致构建过程中transformClassesWithJarMerging的默认task前,出现了一个新task:transformClassesWithCollectJarClassInfoTransform,其作用是记录所有jar包中的类名
 - 默认的Gradle task : transformClassesWithMultidexlist会在build/intermediates/multi-dex/目录下生成maindexlist.txt,内容是它认为应当出现在mainDex中的类
 - 默认的Gradle task : transformClassesWithDex会根据maindexlist.txt生成mainDex,即classes.dex
-- 在这两个task中间,插入自定义task : fixMainDexTask,其
+- 在这两个task中间,插入自定义task : fixMainDexTask,其作用是读取构建工具得到的maindexlist.txt,遍历其中每个类名A.class,然后从CollectJarClassInfoTransform中收集的jar包中的所有类名+build/intermediates/classes目录收集的应用代码中的所有类名两者总集中,找到形如A$B.class的类名,写入maindexlist.txt
+- --minimal-main-dex配置是为了让mainDex一开始只打进必须的类,尽可能小,给后面补进的类留出空间,也避免非必须类的干扰
 
