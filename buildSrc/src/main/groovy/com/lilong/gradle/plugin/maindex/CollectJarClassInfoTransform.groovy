@@ -46,7 +46,7 @@ class CollectJarClassInfoTransform extends Transform{
     void transform(Context context, Collection<TransformInput> inputs, Collection<TransformInput> referencedInputs, TransformOutputProvider outputProvider, boolean isIncremental) throws IOException, TransformException, InterruptedException {
 
         List<String> allClassNamesFromJars = new ArrayList<>()
-        allClassNamesMap.put(context.getPath().replace(":iReader:transformClassesWithCollectJarClassInfoTransformFor", ""), allClassNamesFromJars)
+        allClassNamesMap.put(context.getPath().replace(project.path + ":transformClassesWithCollectJarClassInfoTransformFor", ""), allClassNamesFromJars)
 
         inputs.each { TransformInput input ->
 
