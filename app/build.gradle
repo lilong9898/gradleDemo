@@ -1,3 +1,6 @@
+import com.android.build.gradle.AppPlugin
+import com.android.build.gradle.LibraryPlugin
+
 apply plugin: 'com.android.application'
 apply plugin: com.lilong.gradle.Demo
 
@@ -41,6 +44,16 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support.constraint:constraint-layout:1.1.0'
     providedExternalModule "com.android.support:design:26.0.0"
+    provided fileTree(dir: 'external-support-lib-jars')
+}
+
+// 可以根据当前脚本使用的插件来判断是主工程还是库工程
+getPlugins().each {Plugin plugin ->
+    if(plugin instanceof AppPlugin){
+        println("app")
+    }else if(plugin instanceof LibraryPlugin){
+        println("library")
+    }
 }
 
 apply from: "provided_project.gradle"
